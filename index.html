@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <title> Crepe! </title>
+    <style type="text/css">
+        html {
+            height: 100%;
+        }
+        body {
+            margin: 0;
+            display: grid;
+            height: 100%;
+            min-height: 100%;
+        }
+        #wrapper {
+            margin: auto;
+        }
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            padding: 20px;
+        }
+        label {
+            position: relative;
+            margin: 5px;
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            user-select: none;
+            cursor: pointer;
+            background-color: #c0ffc7;
+        }
+        label[data-value="0"] {
+            background-color: #efefef;
+        }
+        label > input {
+            position: absolute;
+            opacity: 0;
+        }
+        label > .name {
+            font-size: 18px;
+            font-family: sans-serif;
+            user-select: none;
+            cursor: pointer;
+        }
+        label > .text {
+            font-size: 16px;
+            position: absolute;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            user-select: none;
+            cursor: pointer;
+        }
+        output {
+            margin-top: 10px;
+            display: block;
+            text-align: center;
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body onload="init();">
+    <div id="wrapper">
+        <main id="main"></main>
+        <output id="output"> Crepe deve conter algum recheio! </output>
+    </div>
+    <script type="text/javascript">
+        const main = document.getElementById("main");
+        let recheios = [
+            // Sorted alphabetically with the exception of 'Manteiga'
+            // which must be first in this case
+            "Manteiga",
+            "Calabresa",
+            "Carne Moída",
+            "Catupiry",
+            "Cebola",
+            "Cheddar",
+            "Frango",
+            "Milho",
+            "Mussarela",
+            "Presunto",
+            "Tomate"
+        ];
+
+        function init() {
+            const output = document.getElementById("output");;
+            function change(i, o) {
+                return function(e) {
+                    const label = i.parentElement;
+                    label.dataset.value = i.checked ? i.dataset.value : "0";
+                    o.innerText = i.checked ? "Sim" : "Não";
+
+                    update();
+                }
+            }
+
+            function update() {
+                const children = main.children;
+                let pick = 0;
+                for(let i = 0, l = children.length; i < l; i++) {
+                    const val = ~~children[i].dataset.value;
+                    if(isNaN(val)) children[i].dataset.value = 0;
+                    else pick += val;
+                }
+                if(pick < 2)
+                    // No topping selected (either empty or just 'manteiga')
+                    output.innerText = "Crepe deve conter algum recheio!";
+                else
+                    // 2048 options
+                    // - 2 for empty crepes
+                    // + 1 to count from 1
+                    // pick - 2 + 1 => pick - 1
+                    output.innerText = "Crepe nº " + (pick-1) + " / 2046";
+            }
+
+            for(let i = 0, z = 1; i < recheios.length; i++, z *= 2) {
+                let label = document.createElement("label");
+                label.dataset.value = 0;
+
+                let name = document.createElement("p");
+                name.className = "name";
+                name.innerText = recheios[i];
+
+                let text = document.createElement("p");
+                text.className = "text";
+                text.innerText = "Não";
+
+                let input = document.createElement("input");
+                input.type = "checkbox";
+                input.dataset.value = z;
+                input.onchange = change(input, text);
+
+                label.appendChild(name);
+                label.appendChild(input);
+                label.appendChild(text);
+                main.appendChild(label);
+            }
+        }
+    </script>
+</body>
+</html>
